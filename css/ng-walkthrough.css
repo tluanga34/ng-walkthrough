@@ -117,7 +117,6 @@
     border: 2px solid;
     border-radius: 35px;
     padding: 14px;
-    word-break: break-all !important;
     /*margin-top: 0;*/
     /*margin-bottom: 0;*/
 }
@@ -152,9 +151,17 @@
     bottom: 0;
 }
 
+.walkthrough-container-tip .walkthrough-middle {
+    bottom: 50%;
+}
+
 /* take 'done' button into consideration */
 .walkthrough-container-transparency .walkthrough-bottom {
     bottom: 70px;
+}
+
+.walkthrough-container-transparency .walkthrough-middle {
+    bottom: 50%;
 }
 
 .walkthrough-tip-icon-image-front{
@@ -209,4 +216,22 @@
 
 .walkthrough-hero-image{
     margin-top: 15px;
+}
+
+.walkthrough-button-group {
+    position: fixed;
+    width: 100%;
+    z-index: 2000;
+}
+
+.walkthrough-button-group.top {
+    top: 15px;
+}
+
+.walkthrough-button-group.bottom {
+    bottom: 15px;
+}
+
+.walkthrough-button-group .button  {
+    min-width: 105px;
 }

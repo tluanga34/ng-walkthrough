@@ -1,6 +1,6 @@
 angular.module('ng-walkthrough', [])
-    .directive("walkthrough", ['$log', '$timeout', '$window', '$injector', '$compile',
-        function($log, $timeout, $window, $injector, $compile) {
+    .directive("walkthrough", ['$log', '$timeout', '$window', '$injector', '$compile', "$ionicScrollDelegate",
+        function($log, $timeout, $window, $injector, $compile, $ionicScrollDelegate) {
             var DOM_WALKTHROUGH_CLASS = "walkthrough-background";
             var DOM_WALKTHROUGH_TRANSPARENCY_TEXT_CLASS = ".walkthrough-text";
             var DOM_WALKTHROUGH_TIP_TEXT_CLASS = ".walkthrough-tip-text-box";
@@ -21,12 +21,30 @@ angular.module('ng-walkthrough', [])
             var ngWalkthroughTapIcons = null;
 
             var template = [
-                '<div class= "' + DOM_WALKTHROUGH_CLASS + '" ng-class="{\'walkthrough-active\': isVisible}" ng-click="onCloseClicked($event)" on-touch="onCloseTouched($event)">',
+                
+                '<div class= "' + DOM_WALKTHROUGH_CLASS + '" ng-class="{\'walkthrough-active\': isVisible}">',
+               
+               
+                `<div class="walkthrough-button-group" ng-class="buttonPos">
+
+                    <button ng-repeat="button in buttons" ng-class="button.class" ng-bind="button.label" ng-click="button.click()"></button>
+                
+                </div>`,
+
+                
+                
                 '<div class="walkthrough-container walkthrough-container-transparency" ng-show="walkthroughType==\'transparency\'">',
+
+
+                
+
                 '<div class="walkthrough-inner" >',
                 '<div class="'+ DOM_TRANSCLUDE + '"></div>',
                 '<div class="walkthrough-non-transclude-template" ng-show="!hasTransclude">',
-                '<div class="walkthrough-text-container" ng-class="{\'walkthrough-top\': (!forceCaptionLocation || forceCaptionLocation==\'TOP\'), \'walkthrough-bottom\': forceCaptionLocation==\'BOTTOM\'}">',
+
+                `<div class="walkthrough-text-container" ng-class="{'walkthrough-top': (!forceCaptionLocation || forceCaptionLocation=='TOP'), 'walkthrough-bottom': forceCaptionLocation=='BOTTOM', 'walkthrough-middle': forceCaptionLocation=='MIDDLE'}">`,
+                
+                
                 '<pre class="walkthrough-element walkthrough-text" ng-bind="mainCaption">',
                 '</pre>',
                 '<img ng-if="walkthroughHeroImage" class="walkthrough-element walkthrough-hero-image" ng-src="{{walkthroughHeroImage}}" ng-click="onWalkthroughContentClicked()">',
@@ -36,6 +54,8 @@ angular.module('ng-walkthrough', [])
                 '<button class="walkthrough-element walkthrough-button-positive walkthrough-done-button" type="button" ng-if="useButton" ng-click="onCloseClicked($event)" on-touch="onCloseTouched($event)">',
                 '{{buttonCaption}}',
                 '</button>',
+
+                
                 '</div>',
                 '</div>',
                 '</div>',
@@ -84,9 +104,16 @@ angular.module('ng-walkthrough', [])
                     tipColor: '@?',
                     onWalkthroughShow: '&',
                     onWalkthroughHide: '&',
-                    onWalkthroughContentClicked: '&'
+                    buttons: '=?',
+                    buttonPos : "@?",
+                    onWalkthroughContentClicked: '&',
+                    methods : "=?"
                 },
                 link: function (scope, element, attrs, ctrl, $transclude) {
+
+                    console.log("Ng-walkthrough");
+                    console.log(scope);
+
                     var getIcon = function(icon){
                         var retval = null;
                         if (ngWalkthroughTapIcons) {
@@ -175,6 +202,8 @@ angular.module('ng-walkthrough', [])
                             scope.onWalkthroughHide();
                         };
 
+                        scope.methods.close = scope.closeWalkthrough;
+
                         //Event used when background clicked, if we use button then do nothing
                         scope.onCloseClicked = function($event) {
                             $event.stopPropagation();
@@ -212,9 +241,7 @@ angular.module('ng-walkthrough', [])
                             "top:" + (top - PADDING_HOLE) + "px;" +
                             "width:" + (width + (2 * PADDING_HOLE)) + "px;" +
                             "height:" + (height + (2 * PADDING_HOLE)) + "px;";
-                        if(scope.walkthroughHoleElements) {
-                            scope.walkthroughHoleElements.attr('style', holeDimensions);
-                        }
+                        scope.walkthroughHoleElements.attr('style', holeDimensions);
                     };
 
                     //Check if given icon covers text
@@ -388,6 +415,20 @@ angular.module('ng-walkthrough', [])
                     var setElementLocations = function(walkthroughIconWanted, focusElementSelector, iconPaddingLeft, iconPaddingTop){
                         var focusElement = (focusElementSelector)?document.querySelectorAll(focusElementSelector): null;
                         if (focusElement && focusElement.length>0) {
+
+                            console.log("Focus element");
+                            console.log(focusElement);
+                            console.log(focusElement[0].offsetTop);
+                            console.log(window.screen.height);
+                            
+                            
+                            if(focusElement[0].offsetTop > window.screen.height){
+                                // $ionicScrollDelegate.scrollTo(0, (focusElement[0].offsetTop - (window.screen.height / 2)));
+                                focusElement[0].scrollIntoView();
+                            }  
+                            // console.log($ionicScrollDelegate);
+                            // $ionicScrollDelegate.scrollBottom()
+
                             if (focusElement.length > 1) {
                                 $log.warn('Multiple items fit selector, displaying first visible as focus item');
                                 for (var i=0;i<focusElement.length;i++) {
@@ -470,11 +511,6 @@ angular.module('ng-walkthrough', [])
                         }
                     };
 
-                    scope.$watch('focusElementSelector', function(newValue, oldValue) {
-                        if((!oldValue || newValue && oldValue) && attrs.focusElementSelector) {
-                            scope.setFocusOnElement(attrs.focusElementSelector);
-                        }
-                    });
                     scope.$watch('isActive', function(newValue){
                         if(newValue){
                             bindScreenResize();
