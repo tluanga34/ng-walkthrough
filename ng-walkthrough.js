@@ -45,8 +45,8 @@ angular.module('ng-walkthrough', [])
                 `<div class="walkthrough-text-container" ng-class="{'walkthrough-top': (!forceCaptionLocation || forceCaptionLocation=='TOP'), 'walkthrough-bottom': forceCaptionLocation=='BOTTOM', 'walkthrough-middle': forceCaptionLocation=='MIDDLE'}">`,
                 
                 
-                '<pre class="walkthrough-element walkthrough-text" ng-bind="mainCaption">',
-                '</pre>',
+                '<p class="walkthrough-element walkthrough-text" ng-bind="mainCaption">',
+                '</p>',
                 '<img ng-if="walkthroughHeroImage" class="walkthrough-element walkthrough-hero-image" ng-src="{{walkthroughHeroImage}}" ng-click="onWalkthroughContentClicked()">',
                 '</div>',
                 '<img class="walkthrough-element walkthrough-icon" ng-show="icon && icon!=\'arrow\'" ng-src="{{walkthroughIcon}}">',
@@ -110,9 +110,6 @@ angular.module('ng-walkthrough', [])
                     methods : "=?"
                 },
                 link: function (scope, element, attrs, ctrl, $transclude) {
-
-                    console.log("Ng-walkthrough");
-                    console.log(scope);
 
                     var getIcon = function(icon){
                         var retval = null;
